@@ -48,9 +48,9 @@ Authentic, Nostalgic, Trustworthy, and Welcoming.
 * **Backgrounds:** Warm Sand / Off-White (`#F9F6F0`) – Reduces eye strain and feels organic.
 
 ### Typography & Layout
-* **Headings:** *Playfair Display* or *Lora*. A sophisticated serif font.
-* **Body:** *Inter* or *Outfit*. A legible sans-serif that supports international unicode characters (Arabic, Devanagari).
-* **RTL Support:** Soft drop shadows, rounded corners, and Right-to-Left layout responsiveness when transitioning to the Arabic language demo.
+* **Headings:** *Playfair Display* (see `frontend/src/index.css` / Google Fonts import).
+* **Body:** *Inter*. Search input accepts Unicode (Arabic, Devanagari, etc.) even though the **chrome stays English**.
+* **RTL:** `dir="ltr"` is set on the document for this demo; some layout uses logical CSS properties for future RTL polish.
 
 ---
 
@@ -62,12 +62,30 @@ Since this project requires AI collaboration to build the MVP, the stack focuses
 | :--- | :--- | :--- |
 | **Framework** | Vite + React (or Next.js) | AI tools (like Claude/ChatGPT/Copilot) write excellent React code, making it highly compatible with the AI-assisted build requirement. |
 | **Styling** | Vanilla CSS (CSS Modules) | Ensures we can control a custom design system easily generated via prompt engineering. |
-| **Translations** | `react-i18next` | Critical for showing the Indian, Arabic, and Portuguese demos seamlessly. |
-| **Data/Backend** | Mock JSON + React Context | No real backend needed. We will use AI to mock high-quality product JSON databases for the "Bank of products". |
+| **Translations** | `react-i18next` | UI copy is **English-only** for consistency; the same stack supports future locale expansion. Culture for the demo is driven by **query detection** and URL params, not by switching interface language. |
+| **Data/Backend** | Mock JSON + React Context | No real backend. Product bank in `frontend/src/data.js`; `ReviewsContext` and `SearchTopPickContext` hold ephemeral demo state. |
 
 ---
 
-## 5. AI Collaboration & Prompt Engineering Narrative (Required Deliverable)
+## 5. MVP implementation status (aligned with repo)
+
+This section describes what the **current** codebase delivers relative to Sections 1–2.
+
+| PRD intent | Implementation |
+|------------|------------------|
+| Search in native language / script | Users can type Arabic, Hindi, Portuguese, or English keywords; `detectCulture` in `frontend/src/utils.js` sets or suggests `culture` and filters the mock product pool. |
+| Sort & filter | Results page: **Most Authentic** (uses community average including submitted reviews, then static authenticity as tie-breaker), **Nearest**, **Best Price**. URL `sort=` persists choice. |
+| Review & rate | Product page: 0–10 (0.5 steps) authenticity slider + optional text; stored in context and merged into averages for sorting and display. |
+| Recommendation loop | New reviews change **displayed** community average and **Most Authentic** ordering on the next results computation (in-memory; no persistence). |
+| Top match emphasis | Highest authenticity sort shows a **100% AUTHENTIC** raster badge on the top card and on that product’s detail view when still the active top pick. |
+| Navigation | React Router: `/`, `/search`, `/product/:id`. Expandable search in results and product sticky headers. |
+| Dev ergonomics | `npm run dev` uses `scripts/dev-local-disk.mjs` when the repo lives on a cloud-synced path to avoid Vite read timeouts. |
+
+**Presentation tip:** Live demo path — landing search or demo pill → results → sort → open product → submit rating → back to search to show re-ordering if desired.
+
+---
+
+## 6. AI Collaboration & Prompt Engineering Narrative (Required Deliverable)
 
 Because the academic rubric grades you heavily on **how you worked with AI**, you must keep an ongoing log of your prompt engineering process while building Rooted.
 

@@ -1,16 +1,38 @@
-# React + Vite
+# Rooted — frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Single-page application for the Rooted retail discovery demo.
 
-Currently, two official plugins are available:
+## Commands
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev          # recommended: local-disk copy + Vite (see scripts/dev-local-disk.mjs)
+npm run dev:vite     # vite only, from this folder
+npm run build
+npm run lint
+npm run preview
+```
 
-## React Compiler
+## Project structure (high level)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+src/
+  App.jsx, main.jsx, App.css, index.css, i18n.js, data.js, utils.js
+  components/     Layout, ProductCard, ExpandableSearchField, TastesLikeHomeStamp, RootedLogo
+  context/        ReviewsContext, SearchTopPickContext
+  pages/          LandingPage, SearchPage, ProductPage
+  assets/         e.g. top-pick-badge.png
+scripts/
+  dev-local-disk.mjs
+```
 
-## Expanding the ESLint configuration
+## Developing from a cloud-synced folder
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+If `npm run dev:vite` fails with file read timeouts, keep using **`npm run dev`**, which syncs `src`, `public`, and config into a temp directory before starting Vite. Edit files in the repo; the script watches and copies changes (see comments in `dev-local-disk.mjs`).
+
+## Environment hints
+
+- `ROOTED_ALLOW_CLOUD_VITE=1` — used with `dev:vite` when explicitly running on a slow/cloud path.
+- `ROOTED_VITE_DIR` — override the temp copy destination for `npm run dev`.
+
+See the repository **[README.md](../README.md)** for product behaviour and routes.
