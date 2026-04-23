@@ -1,14 +1,18 @@
-import { productsData } from './data';
+// import { productsData } from './data';
 
 /** Script/diacritics + English demo keywords. UI stays English; this only picks which product pool to search. */
 export function detectCulture(text) {
   const raw = (text || '').trim();
   if (!raw) return null;
   if (/[\u0600-\u06FF]/.test(raw)) return 'ar';
-  if (/[\u0900-\u097F]/.test(raw)) return 'hi';
+  if (/[\u0900-\u0D7F]/.test(raw)) return 'hi'; // Covers Devanagari, Bengali, Telugu, Tamil, etc.
   if (/[àáâãçéêíóôõúü]/i.test(raw)) return 'pt';
 
   const lower = raw.toLowerCase();
+  
+  // UK demo: map english regional keywords to the indian culture
+  if (/\b(telugu|tamil|malayalam|kannada|bengali|hindi|indian)\b/.test(lower)) return 'hi';
+
   // UK thyme demo: English queries must still filter to the 13 curated ar listings, not all 46 products.
   if (/\b(thyme|wild thyme|dried thyme|fresh thyme)\b/.test(lower)) return 'ar';
   if (/\bza['\u2019]?atar\b/i.test(lower) || /\bzaatar\b/i.test(lower)) return 'ar';
@@ -16,42 +20,20 @@ export function detectCulture(text) {
   return null;
 }
 
-export function searchProducts(query, cultureFilter) {
-  const q = query.toLowerCase().trim();
-  const tokens = q.split(/\s+/).filter((tok) => tok.length >= 2);
+export async function searchProducts(query, cultureFilter, sort) {
+  const params = new URLSearchParams();
+  if (query) params.set('q', query);
+  if (cultureFilter) params.set('culture', cultureFilter);
+  if (sort) params.set('sort', sort);
 
-  const pool = cultureFilter
-    ? productsData.filter(p => p.culture === cultureFilter)
-    : productsData;
-
-  if (!q) return pool;
-
-  const scored = pool.map(product => {
-    const fields = [
-      product.name.toLowerCase(),
-      ...(product.tags || []).map(t => t.toLowerCase()),
-      ...(product.keywords || []).map(k => k.toLowerCase()),
-      product.store.toLowerCase(),
-      (product.nativeDesc || '').toLowerCase(),
-    ];
-
-    let score = 0;
-    const nameLower = product.name.toLowerCase();
-    for (const field of fields) {
-      if (field.includes(q) || q.includes(field)) score += 5;
-      for (const tok of tokens) {
-        if (tok !== q && field.includes(tok)) score += 2;
-      }
-    }
-    if (nameLower.includes(q)) score += 10;
-    for (const tok of tokens) {
-      if (tok !== q && nameLower.includes(tok)) score += 3;
-    }
-
-    return { ...product, _score: score };
-  });
-
-  return scored.sort((a, b) => b._score - a._score);
+  try {
+    const res = await fetch(`http://localhost:3000/api/products?${params.toString()}`);
+    if (!res.ok) throw new Error('API Error');
+    return await res.json();
+  } catch (err) {
+    console.error('Failed to fetch products', err);
+    return [];
+  }
 }
 
 export function getCultureName(culture, t) {

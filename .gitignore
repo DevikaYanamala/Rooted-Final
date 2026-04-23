@@ -2,3 +2,19 @@
 Thumbs.db
 node_modules/
 **/vite.config.js.timestamp-*.mjs
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.production
+.env.*.local
+backend/.env
+frontend/.env
+
+# Build output
+frontend/dist/
+frontend/.vercel/
+
+# Logs
+*.log
+npm-debug.log*

@@ -12,6 +12,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^6.2.0",
+    "@stripe/stripe-js": "^9.3.0",
     "framer-motion": "^12.38.0",
     "i18next": "^25.10.5",
     "lucide-react": "^1.0.1",

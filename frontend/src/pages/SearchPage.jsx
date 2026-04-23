@@ -40,18 +40,20 @@ export default function SearchPage() {
     );
   }, [q, culture, setSearchParams]);
 
-  const results = useMemo(() => {
-    const r = searchProducts(q, culture);
-    const ratingFor = (p) =>
-      getProductAverageRating(p, communityReviews[p.id] ?? NO_EXTRA);
-    return [...r].sort((a, b) => {
-      if (sort === 'distance') return a.score_distance - b.score_distance;
-      if (sort === 'price') return a.score_price - b.score_price;
-      const diff = ratingFor(b) - ratingFor(a);
-      if (diff !== 0) return diff;
-      return b.score_authenticity - a.score_authenticity;
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    searchProducts(q, culture, sort).then(data => {
+      if (active) {
+        setResults(data);
+        setLoading(false);
+      }
     });
-  }, [q, culture, sort, communityReviews]);
+    return () => { active = false; };
+  }, [q, culture, sort]);
 
   useEffect(() => {
     if (sort !== 'authenticity') {

@@ -55,6 +55,50 @@ const resources = {
       top_pick_badge_alt: '100% authentic — top match for your search',
     },
   },
+  hi: {
+    translation: {
+      app_name: 'रुटेड',
+      tagline: 'हर बाइट, घर की एक यात्रा',
+      search_placeholder: 'किसी भी भाषा में खोजें...',
+      buy_from: 'यहाँ से खरीदें',
+      reviews: 'समुदाय की समीक्षाएं',
+      nearby_stores: 'आसपास के स्टोर से ऑर्डर करें',
+      footer_line: 'रुटेड · हर बाइट, घर की एक यात्रा'
+    }
+  },
+  ar: {
+    translation: {
+      app_name: 'روتيد',
+      tagline: 'كل لقمة، رحلة إلى الوطن',
+      search_placeholder: 'ابحث بأي لغة...',
+      buy_from: 'اشتري من',
+      reviews: 'آراء المجتمع',
+      nearby_stores: 'اطلب من المتاجر القريبة',
+      footer_line: 'روتيد · كل لقمة، رحلة إلى الوطن'
+    }
+  },
+  es: {
+    translation: {
+      app_name: 'Rooted',
+      tagline: 'Cada bocado, un viaje a casa',
+      search_placeholder: 'Buscar en cualquier idioma...',
+      buy_from: 'Comprar de',
+      reviews: 'Reseñas de la comunidad',
+      nearby_stores: 'Pedir en tiendas cercanas',
+      footer_line: 'Rooted · Cada bocado, un viaje a casa'
+    }
+  },
+  fr: {
+    translation: {
+      app_name: 'Rooted',
+      tagline: 'Chaque bouchée, un voyage vers la maison',
+      search_placeholder: 'Chercher dans n\'importe quelle langue...',
+      buy_from: 'Acheter chez',
+      reviews: 'Avis de la communauté',
+      nearby_stores: 'Commander dans les magasins à proximité',
+      footer_line: 'Rooted · Chaque bouchée, un voyage vers la maison'
+    }
+  }
 };
 
 i18n.use(initReactI18next).init({
