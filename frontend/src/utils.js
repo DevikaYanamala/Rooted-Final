@@ -11,7 +11,10 @@ export function detectCulture(text) {
   const lower = raw.toLowerCase();
   
   // UK demo: map english regional keywords to the indian culture
-  if (/\b(telugu|tamil|malayalam|kannada|bengali|hindi|indian)\b/.test(lower)) return 'hi';
+  if (/\b(telugu|tamil|malayalam|kannada|bengali|hindi|indian|india)\b/.test(lower)) return 'hi';
+  if (/\b(arabic|arab|lebanese|lebanon|syrian|syria)\b/.test(lower)) return 'ar';
+  if (/\b(brazilian|brazil|portuguese)\b/.test(lower)) return 'pt';
+  if (/\b(chinese|china|mandarin|cantonese)\b/.test(lower)) return 'zh';
 
   // UK thyme demo: English queries must still filter to the 13 curated ar listings, not all 46 products.
   if (/\b(thyme|wild thyme|dried thyme|fresh thyme)\b/.test(lower)) return 'ar';
@@ -20,11 +23,13 @@ export function detectCulture(text) {
   return null;
 }
 
-export async function searchProducts(query, cultureFilter, sort) {
+export async function searchProducts(query, cultureFilter, sort, category, location) {
   const params = new URLSearchParams();
   if (query) params.set('q', query);
   if (cultureFilter) params.set('culture', cultureFilter);
   if (sort) params.set('sort', sort);
+  if (category) params.set('category', category);
+  if (location) params.set('location', location);
 
   try {
     const res = await fetch(`http://localhost:3000/api/products?${params.toString()}`);
@@ -37,10 +42,11 @@ export async function searchProducts(query, cultureFilter, sort) {
 }
 
 export function getCultureName(culture, t) {
+  if (!culture) return t('all_cultures');
   if (culture === 'ar') return t('culture_arabic');
   if (culture === 'hi') return t('culture_indian');
   if (culture === 'pt') return t('culture_brazilian');
-  return t('all_cultures');
+  return culture.charAt(0).toUpperCase() + culture.slice(1);
 }
 
 /** Community average from seeded reviews + optional extra reviews (same formula everywhere). */

@@ -48,7 +48,7 @@ export default function CartModal({ isOpen, onClose }) {
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>Your Cart</h2>
+              <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>Your Shopping List</h2>
               <button 
                 onClick={onClose} 
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', color: '#666' }}
@@ -59,7 +59,7 @@ export default function CartModal({ isOpen, onClose }) {
 
             <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {cartItems.length === 0 ? (
-                <p style={{ textAlign: 'center', color: '#666', marginTop: '2rem' }}>Your cart is empty.</p>
+                <p style={{ textAlign: 'center', color: '#666', marginTop: '2rem' }}>Your list is empty.</p>
               ) : (
                 cartItems.map(item => (
                   <div key={item.id} style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid #eaeaea', paddingBottom: '1rem' }}>
@@ -100,7 +100,7 @@ export default function CartModal({ isOpen, onClose }) {
                 style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', borderRadius: '8px', opacity: cartItems.length === 0 ? 0.5 : 1 }}
                 disabled={cartItems.length === 0}
               >
-                Proceed to Checkout
+                Find My Items
               </button>
             </div>
           </motion.div>

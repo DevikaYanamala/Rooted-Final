@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo, useEffect } from 'react';
-import { ArrowLeft, MapPin, Award, ExternalLink, Star, Search, X, ShoppingCart, Store } from 'lucide-react';
+import { ArrowLeft, MapPin, Award, ExternalLink, Star, Search, X, ClipboardList, Store } from 'lucide-react';
 import { productsData } from '../data';
 import { getProductAverageRating, formatAvgRating, authenticityToSliderValue, detectCulture } from '../utils';
 import ExpandableSearchField from '../components/ExpandableSearchField';
@@ -156,81 +156,119 @@ function ProductPageContent({ product, mutateProduct }) {
             onClick={handleAddToCart}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.8rem' }}
           >
-            <ShoppingCart size={20} />
-            {addedToCart ? "Added to Cart!" : "Add to Cart"}
+            <ClipboardList size={20} />
+            {addedToCart ? "Added to List!" : "Add to List"}
           </button>
         </div>
 
         {product.nearbyStores && product.nearbyStores.length > 0 && (() => {
-          const sorted = [...product.nearbyStores].sort((a, b) => a.distance - b.distance);
-          const nearest = sorted[0];
+          const localStores = [...product.nearbyStores].filter(store => store.distance <= 15).sort((a, b) => a.distance - b.distance);
+          const farStores = [...product.nearbyStores].filter(store => store.distance > 15).sort((a, b) => a.distance - b.distance);
+          
+          if (localStores.length === 0 && farStores.length === 0) return null;
+          
           return (
             <div className="nearby-stores" style={{ marginBottom: '1.5rem' }}>
-              {/* Nearest store highlight */}
-              <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #204E4A 0%, #2a6b65 100%)', borderRadius: '12px', marginBottom: '1rem', color: 'white' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', marginBottom: '0.5rem', opacity: 0.85 }}>
-                  <MapPin size={14} /> NEAREST STORE
+              
+              {localStores.length === 0 && farStores.length > 0 && (
+                <div style={{ padding: '1rem', background: '#fff3cd', color: '#856404', borderRadius: '12px', marginBottom: '1rem', border: '1px solid #ffeeba' }}>
+                  <strong style={{ display: 'block', marginBottom: '0.5rem' }}>No Local Stores Found</strong>
+                  <span style={{ fontSize: '0.9rem' }}>Sorry, there are no stores available based on your preference locally (within 30 mins). However, your items are available further away or for online delivery below:</span>
                 </div>
-                <strong style={{ fontSize: '1.1rem' }}>{nearest.name}</strong>
-                <div style={{ fontSize: '0.85rem', marginTop: '0.3rem', opacity: 0.9 }}>
-                  {nearest.area} · {nearest.distance} mi · <span style={{ color: nearest.stock === 'In stock' ? '#6ee7b7' : '#fcd34d' }}>{nearest.stock}</span>
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.8rem' }}>
-                  <button
-                    className="btn-secondary"
-                    onClick={() => setMapStore(nearest)}
-                    style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', background: 'white', color: '#204E4A', border: 'none' }}
-                  >
-                    Order Pickup
-                  </button>
-                  {nearest.website && (
-                    <a
-                      href={nearest.website}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', background: '#D95D39', color: 'white', borderRadius: '6px', textDecoration: 'none', display: 'inline-block' }}
-                    >
-                      Order Online
-                    </a>
-                  )}
-                </div>
-              </div>
+              )}
 
-              {/* All stores list, nearest to farthest */}
-              {sorted.length > 1 && (
+              {localStores.length > 0 && (
+                <>
+                  {/* Nearest local store highlight */}
+                  <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #204E4A 0%, #2a6b65 100%)', borderRadius: '12px', marginBottom: '1rem', color: 'white' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', marginBottom: '0.5rem', opacity: 0.85 }}>
+                      <MapPin size={14} /> NEAREST LOCAL STORE
+                    </div>
+                    <strong style={{ fontSize: '1.1rem' }}>{localStores[0].name}</strong>
+                    <div style={{ fontSize: '0.85rem', marginTop: '0.3rem', opacity: 0.9 }}>
+                      {localStores[0].area} · {localStores[0].distance} mi (~{Math.ceil(localStores[0].distance * 3)} min drive) · <span style={{ color: localStores[0].stock === 'In stock' ? '#6ee7b7' : '#fcd34d' }}>{localStores[0].stock}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.8rem' }}>
+                      <button
+                        className="btn-secondary"
+                        onClick={() => setMapStore(localStores[0])}
+                        style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', background: 'white', color: '#204E4A', border: 'none' }}
+                      >
+                        Order Pickup
+                      </button>
+                      {localStores[0].website && (
+                        <a
+                          href={localStores[0].website}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', background: '#D95D39', color: 'white', borderRadius: '6px', textDecoration: 'none', display: 'inline-block' }}
+                        >
+                          Order Online
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* All other local stores list */}
+                  {localStores.length > 1 && (
+                    <div style={{ padding: '1rem', background: '#fcfcfc', borderRadius: '12px', border: '1px solid #eee', marginBottom: '1rem' }}>
+                      <h4 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '1rem', color: '#555' }}>
+                        <Store size={16} /> Other local stores
+                      </h4>
+                      <div className="store-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                        {localStores.slice(1).map((store, idx) => (
+                          <div key={store.id} className="store-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem', background: 'white', border: '1px solid #eaeaea', borderRadius: '8px' }}>
+                            <div className="store-card__info" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                              <span style={{ background: '#e5e7eb', color: '#555', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 'bold', flexShrink: 0 }}>
+                                {idx + 2}
+                              </span>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                                <strong style={{ fontSize: '0.9rem' }}>{store.name}</strong>
+                                <span style={{ fontSize: '0.78rem', color: '#666' }}>{store.area} · {store.distance} mi (~{Math.ceil(store.distance * 3)} min) · <span style={{ color: store.stock === 'In stock' ? '#059669' : '#D97706' }}>{store.stock}</span></span>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.4rem' }}>
+                              <button
+                                className="btn-secondary"
+                                onClick={() => setMapStore(store)}
+                                style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}
+                              >
+                                Pickup
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Far away / Online stores */}
+              {farStores.length > 0 && (
                 <div style={{ padding: '1rem', background: '#fcfcfc', borderRadius: '12px', border: '1px solid #eee' }}>
                   <h4 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '1rem', color: '#555' }}>
-                    <Store size={16} /> All stores near {product.userLocation || 'you'} — nearest first
+                    <Store size={16} /> Available for Shipping / Far Away
                   </h4>
                   <div className="store-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                    {sorted.map((store, idx) => (
-                      <div key={store.id} className="store-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem', background: 'white', border: idx === 0 ? '2px solid #204E4A' : '1px solid #eaeaea', borderRadius: '8px' }}>
+                    {farStores.map((store) => (
+                      <div key={store.id} className="store-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem', background: 'white', border: '1px solid #eaeaea', borderRadius: '8px' }}>
                         <div className="store-card__info" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                          <span style={{ background: idx === 0 ? '#204E4A' : '#e5e7eb', color: idx === 0 ? 'white' : '#555', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 'bold', flexShrink: 0 }}>
-                            {idx + 1}
-                          </span>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
                             <strong style={{ fontSize: '0.9rem' }}>{store.name}</strong>
-                            <span style={{ fontSize: '0.78rem', color: '#666' }}>{store.area} · {store.distance} mi · <span style={{ color: store.stock === 'In stock' ? '#059669' : '#D97706' }}>{store.stock}</span></span>
+                            <span style={{ fontSize: '0.78rem', color: '#666' }}>{store.area} · {store.distance} mi (~{Math.ceil(store.distance / 60)} hrs drive) · <span style={{ color: store.stock === 'In stock' ? '#059669' : '#D97706' }}>{store.stock}</span></span>
                           </div>
                         </div>
                         <div style={{ display: 'flex', gap: '0.4rem' }}>
-                          <button
-                            className="btn-secondary"
-                            onClick={() => setMapStore(store)}
-                            style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}
-                          >
-                            Pickup
-                          </button>
                           {store.website && (
                             <a
                               href={store.website}
                               target="_blank"
                               rel="noreferrer"
                               className="btn-primary"
-                              style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', textDecoration: 'none', display: 'inline-block' }}
+                              style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', textDecoration: 'none', display: 'inline-block' }}
                             >
-                              Online
+                              Order Online
                             </a>
                           )}
                         </div>
@@ -329,7 +367,7 @@ function ProductPageContent({ product, mutateProduct }) {
             <div style={{ padding: '1rem 1.2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.1rem' }}>{mapStore.name}</h3>
-                <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#666' }}>{mapStore.area} · {mapStore.distance} mi</p>
+                <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#666' }}>{mapStore.area} · {mapStore.distance} mi (~{Math.ceil(mapStore.distance * 3)} min drive)</p>
               </div>
               <button onClick={() => setMapStore(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#666' }}>✕</button>
             </div>

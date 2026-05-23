@@ -1,14 +1,13 @@
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Award, MapPin, Tag, ChevronDown, ChevronUp } from 'lucide-react';
-import { DEMO_SCENARIOS } from '../data';
-import { detectCulture, searchProducts, getCultureName, getProductAverageRating } from '../utils';
+import { Award, MapPin, Tag } from 'lucide-react';
+import { detectCulture, searchProducts, getCultureName } from '../utils';
 import ProductCard from '../components/ProductCard';
 import ExpandableSearchField from '../components/ExpandableSearchField';
 import { useSearchTopPick } from '../context/SearchTopPickContext';
 import { useReviews } from '../context/ReviewsContext';
+import { usePreferences } from '../context/PreferencesContext';
 
 const NO_EXTRA = [];
 
@@ -19,14 +18,15 @@ export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get('q') || '';
   const culture = searchParams.get('culture') || null;
+  const category = searchParams.get('category') || 'groceries';
   const sort = searchParams.get('sort') || 'authenticity';
+  const { location } = usePreferences();
 
   const [query, setQuery] = useState(q);
-  const [showDemos, setShowDemos] = useState(false);
 
   useEffect(() => { setQuery(q); }, [q]);
 
-  /** Arabic/Hindi/Portuguese in the query must set ?culture= so we filter to the right demo list (not all 46 products). */
+  /** Arabic/Hindi/Portuguese in the query must set ?culture= so we filter to the right list (not all 46 products). */
   useEffect(() => {
     const detected = detectCulture(q);
     if (!detected || culture) return;
@@ -46,14 +46,14 @@ export default function SearchPage() {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    searchProducts(q, culture, sort).then(data => {
+    searchProducts(q, culture, sort, category, location).then(data => {
       if (active) {
         setResults(data);
         setLoading(false);
       }
     });
     return () => { active = false; };
-  }, [q, culture, sort]);
+  }, [q, culture, sort, category, location]);
 
   useEffect(() => {
     if (sort !== 'authenticity') {
@@ -78,11 +78,6 @@ export default function SearchPage() {
     setSearchParams(params);
   };
 
-  const runScenario = (scenarioCulture, scenarioQuery) => {
-    setQuery(scenarioQuery);
-    setSearchParams({ q: scenarioQuery, culture: scenarioCulture });
-  };
-
   return (
     <div className="results-view">
       <header className="results-header">
@@ -96,47 +91,13 @@ export default function SearchPage() {
       </header>
 
       <section className="results-branding">
-        <p className="results-branding__subtitle">{t('results_subtitle')}</p>
+        <h2 style={{ fontSize: '1.5rem', margin: '0 0 0.5rem', color: '#1a1a1a', textTransform: 'capitalize' }}>
+          {category.replace('-', ' ')}
+        </h2>
         <p className="results-branding__meta">
           {results.length} {t('results_count')} · {getCultureName(culture, t)}
         </p>
       </section>
-
-      <div className="demo-toggle-wrap demo-toggle-wrap--results">
-        <button
-          type="button"
-          className="demo-toggle demo-toggle--compact"
-          onClick={() => setShowDemos((v) => !v)}
-          aria-expanded={showDemos}
-        >
-          {showDemos ? t('hide_demos') : t('show_demos')}
-          {showDemos ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        </button>
-      </div>
-
-      <AnimatePresence>
-        {showDemos && (
-          <motion.div
-            className="demo-row"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-          >
-            {DEMO_SCENARIOS.map((scenario) => (
-              <button
-                key={`d-${scenario.id}`}
-                className={`demo-pill ${culture === scenario.id ? 'demo-pill--active' : ''}`}
-                onClick={() => runScenario(scenario.id, scenario.query)}
-                type="button"
-              >
-                <span className="demo-pill__query">{scenario.query}</span>
-                <span className="demo-pill__label">{getCultureName(scenario.id, t)}</span>
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <div className="sort-row">
         <span className="sort-row__label">{t('sort_by')}:</span>

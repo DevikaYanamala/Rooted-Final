@@ -28,6 +28,9 @@ const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
   'http://localhost:5173',
   'http://localhost:4173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'http://localhost:5176',
 ];
 
 app.use(
@@ -127,15 +130,120 @@ const apiLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 
 // ── In-memory product store (seeded with mock data) ───────────────────────────
-let products = [...productsData];
+let products = [...productsData].map(p => {
+  let category = 'groceries';
+  if (p.id === 101) category = 'food';
+  return { ...p, category };
+});
+
+// Mock items for the new categories to demonstrate the MVP flow
+products.push({
+  id: 102, name: 'Hyderabadi Dum Biryani', nativeDesc: 'హైదరాబాదీ దమ్ బిర్యానీ', img: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=800', culture: 'hi', score_authenticity: 9.7, score_distance: 1.2, score_price: 14.50, store: 'Biryani House, Newcastle', location: 'Newcastle upon Tyne', retailerName: 'Biryani House', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Indian', 'Prepared Food', 'Biryani', 'Restaurant'], reviews: 342, keywords: ['biryani', 'hyderabad', 'indian', 'food'], reviewSamples: [], category: 'food'
+});
+products.push({
+  id: 103, name: 'Authentic Masala Dosa', nativeDesc: 'మసాలా దోశ', img: 'https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?auto=format&fit=crop&q=80&w=800', culture: 'hi', score_authenticity: 9.5, score_distance: 2.0, score_price: 9.99, store: 'South Indian Cafe, Newcastle', location: 'Newcastle upon Tyne', retailerName: 'South Indian Cafe', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Indian', 'Prepared Food', 'Dosa', 'Restaurant'], reviews: 215, keywords: ['dosa', 'south indian', 'food', 'breakfast'], reviewSamples: [], category: 'food'
+});
+products.push({
+  id: 104, name: 'Punjabi Chole Bhature', nativeDesc: 'छोले भटूरे', img: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&q=80&w=800', culture: 'hi', score_authenticity: 9.6, score_distance: 0.8, score_price: 11.50, store: 'Punjabi Dhaba, Newcastle', location: 'Newcastle upon Tyne', retailerName: 'Punjabi Dhaba', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Indian', 'Prepared Food', 'Punjabi', 'Restaurant'], reviews: 189, keywords: ['chole', 'bhature', 'punjabi', 'indian', 'food'], reviewSamples: [], category: 'food'
+});
+
+products.push({
+  id: 201, name: 'Traditional Brass Pooja Thali', nativeDesc: 'पूजा थाली', img: 'https://images.unsplash.com/photo-1603513492128-ba7bfafbbc8f?auto=format&fit=crop&q=80&w=800', culture: 'hi', score_authenticity: 9.6, score_distance: 2.1, score_price: 25.00, store: 'Desi Decor, Newcastle', location: 'Newcastle upon Tyne', retailerName: 'Desi Decor', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Indian', 'Home', 'Decor', 'Pooja'], reviews: 45, keywords: ['brass', 'pooja', 'thali', 'home', 'decor', 'indian'], reviewSamples: [], category: 'home'
+});
+products.push({
+  id: 301, name: 'Cotton Kurta Pajama Set', nativeDesc: 'कुर्ता पजामा', img: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=800', culture: 'hi', score_authenticity: 9.4, score_distance: 1.8, score_price: 45.00, store: 'Ethnic Wear UK, Newcastle', location: 'Newcastle upon Tyne', retailerName: 'Ethnic Wear UK', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Indian', 'Fashion', 'Clothing', 'Kurta'], reviews: 112, keywords: ['kurta', 'pajama', 'clothing', 'fashion', 'indian'], reviewSamples: [], category: 'fashion'
+});
+products.push({
+  id: 401, name: 'Patanjali Ayurvedic Hair Oil', nativeDesc: 'पतंजलि केश कांति', img: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&q=80&w=800', culture: 'hi', score_authenticity: 9.5, score_distance: 0.9, score_price: 8.50, store: 'AyurCare Store, Newcastle', location: 'Newcastle upon Tyne', retailerName: 'AyurCare Store', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Indian', 'Wellness', 'Ayurveda', 'Hair'], reviews: 89, keywords: ['patanjali', 'hair', 'oil', 'ayurvedic', 'wellness'], reviewSamples: [], category: 'wellness'
+});
+
+// Mock items for China
+products.push({
+  id: 501, name: 'Lao Gan Ma Chili Crisp', nativeDesc: '老干妈', img: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?auto=format&fit=crop&q=80&w=800', culture: 'zh', score_authenticity: 9.8, score_distance: 1.5, score_price: 4.50, store: 'Oriental Supermarket', location: 'Newcastle upon Tyne', retailerName: 'Oriental Supermarket', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Chinese', 'Groceries', 'Sauce'], reviews: 450, keywords: ['chili', 'crisp', 'sauce', 'chinese', 'china'], reviewSamples: [], category: 'groceries'
+});
+products.push({
+  id: 502, name: 'Authentic Sichuan Mapo Tofu', nativeDesc: '麻婆豆腐', img: 'https://images.unsplash.com/photo-1564834744159-ff0ea41ba4b9?auto=format&fit=crop&q=80&w=800', culture: 'zh', score_authenticity: 9.6, score_distance: 0.5, score_price: 12.00, store: 'Sichuan House', location: 'Newcastle upon Tyne', retailerName: 'Sichuan House', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Chinese', 'Food', 'Restaurant'], reviews: 220, keywords: ['mapo', 'tofu', 'chinese', 'food', 'china'], reviewSamples: [], category: 'food'
+});
+products.push({
+  id: 503, name: 'Traditional Chinese Tea Set', nativeDesc: '茶具', img: 'https://images.unsplash.com/photo-1576092762791-dd9e2220cad1?auto=format&fit=crop&q=80&w=800', culture: 'zh', score_authenticity: 9.5, score_distance: 2.2, score_price: 35.00, store: 'Eastern Home Decor', location: 'Newcastle upon Tyne', retailerName: 'Eastern Home Decor', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Chinese', 'Home', 'Tea'], reviews: 85, keywords: ['tea', 'set', 'chinese', 'china', 'home'], reviewSamples: [], category: 'home'
+});
+
+// Mock items for Brazil (Food, Home) to prevent empty category screens
+products.push({
+  id: 601, name: 'Authentic Feijoada Completa', nativeDesc: 'Feijoada', img: 'https://images.unsplash.com/photo-1541528658428-fb03983fceaa?auto=format&fit=crop&q=80&w=800', culture: 'pt', score_authenticity: 9.7, score_distance: 1.1, score_price: 18.00, store: 'Sabor do Brasil', location: 'Newcastle upon Tyne', retailerName: 'Sabor do Brasil', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Brazilian', 'Food', 'Restaurant'], reviews: 145, keywords: ['feijoada', 'brazil', 'brazilian', 'food'], reviewSamples: [], category: 'food'
+});
+products.push({
+  id: 602, name: 'Havaianas Original', nativeDesc: 'Chinelo', img: 'https://images.unsplash.com/photo-1620331311520-246422fd82f9?auto=format&fit=crop&q=80&w=800', culture: 'pt', score_authenticity: 9.9, score_distance: 1.5, score_price: 25.00, store: 'Brazilian Boutique', location: 'Newcastle upon Tyne', retailerName: 'Brazilian Boutique', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Brazilian', 'Fashion', 'Shoes'], reviews: 320, keywords: ['havaianas', 'chinelo', 'brazil', 'fashion'], reviewSamples: [], category: 'fashion'
+});
+
+// Mock items for Lebanon (Food, Home)
+products.push({
+  id: 701, name: 'Fresh Chicken Shawarma Wrap', nativeDesc: 'شاورما', img: 'https://images.unsplash.com/photo-1619881590082-a0b5b11ba9e4?auto=format&fit=crop&q=80&w=800', culture: 'ar', score_authenticity: 9.6, score_distance: 0.6, score_price: 8.50, store: 'Beirut Nights Express', location: 'Newcastle upon Tyne', retailerName: 'Beirut Nights Express', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Lebanese', 'Food', 'Restaurant'], reviews: 410, keywords: ['shawarma', 'lebanon', 'arabic', 'food'], reviewSamples: [], category: 'food'
+});
+products.push({
+  id: 702, name: 'Handcrafted Olive Wood Bowl', nativeDesc: 'وعاء خشب زيتون', img: 'https://images.unsplash.com/photo-1615529182904-14819c35db37?auto=format&fit=crop&q=80&w=800', culture: 'ar', score_authenticity: 9.8, score_distance: 2.3, score_price: 42.00, store: 'Levant Artisans', location: 'Newcastle upon Tyne', retailerName: 'Levant Artisans', retailerUrl: '', retailerLogo: '', productUrl: '', tags: ['Lebanese', 'Home', 'Artisan'], reviews: 55, keywords: ['olive', 'wood', 'bowl', 'lebanon', 'arabic', 'home'], reviewSamples: [], category: 'home'
+});
 
 // ── Existing product routes ────────────────────────────────────────────────────
 app.get('/api/products', (req, res) => {
-  let { culture, q, sort } = req.query;
+  let { culture, q, sort, category } = req.query;
   let result = products;
 
+  if (category) {
+    result = result.filter(p => p.category === category);
+  }
+
   if (culture) {
-    result = result.filter(p => p.culture === culture);
+    const cultureLower = culture.toLowerCase();
+    let mappedCulture = culture;
+
+    // Map user-typed search terms to our 3 mock data pools
+    if (/\b(telugu|tamil|malayalam|kannada|bengali|hindi|indian|india)\b/.test(cultureLower)) {
+      mappedCulture = 'hi';
+    } else if (/\b(arabic|arab|lebanese|lebanon|middle east|syrian|syria)\b/.test(cultureLower)) {
+      mappedCulture = 'ar';
+    } else if (/\b(brazilian|brazil|portuguese)\b/.test(cultureLower)) {
+      mappedCulture = 'pt';
+    } else if (/\b(chinese|china|mandarin|cantonese)\b/.test(cultureLower)) {
+      mappedCulture = 'zh';
+    }
+
+    // Only filter if it strictly matches one of our known pools, 
+    // otherwise let it return empty so we accurately simulate 0 results.
+    if (['hi', 'ar', 'pt', 'zh'].includes(mappedCulture)) {
+      result = result.filter(p => p.culture === mappedCulture);
+    } else {
+      // DYNAMIC "WHOLE WORLD" FALLBACK
+      const existing = products.filter(p => p.culture === mappedCulture && p.category === category);
+      if (existing.length > 0) {
+        result = existing;
+      } else {
+        const capCulture = culture.charAt(0).toUpperCase() + culture.slice(1);
+        const dynamicItem = {
+          id: products.length + 5000,
+          name: category === 'food' ? `Authentic ${capCulture} Speciality` : category === 'home' ? `Traditional ${capCulture} Decor` : category === 'fashion' ? `${capCulture} Native Wear` : `Imported ${capCulture} Goods`,
+          nativeDesc: capCulture,
+          img: category === 'food' ? 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=800' : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800',
+          culture: mappedCulture,
+          score_authenticity: 9.6,
+          score_distance: 125.0, // Force far distance
+          score_price: 24.50,
+          store: `${capCulture} National Importers`,
+          location: 'National Distribution',
+          retailerName: `${capCulture} National Importers`,
+          retailerUrl: 'https://amazon.co.uk',
+          retailerLogo: '',
+          productUrl: '',
+          tags: [capCulture, 'Imported', 'Authentic'],
+          reviews: 56,
+          keywords: [culture.toLowerCase()],
+          reviewSamples: [],
+          category: category || 'groceries'
+        };
+        products.push(dynamicItem);
+        result = [dynamicItem];
+      }
+    }
   }
 
   if (q) {
@@ -169,6 +277,13 @@ app.get('/api/products', (req, res) => {
       result.sort((a, b) => a.score_price - b.score_price);
     }
   }
+
+  const userLoc = req.query.location || 'Newcastle upon Tyne';
+  result = result.map(p => ({
+    ...p,
+    store: `${p.retailerName || 'Local Store'}, ${userLoc}`,
+    location: userLoc
+  }));
 
   res.json(result);
 });
@@ -233,10 +348,21 @@ const UK_CITY_COORDS = {
   Cardiff: { lat: 51.4816, lng: -3.1791 },
   Belfast: { lat: 54.5973, lng: -5.9301 },
   'Newcastle upon Tyne': { lat: 54.9783, lng: -1.6178 },
+  'Barking': { lat: 51.5362, lng: 0.0812 },
+  'IG11 9HZ': { lat: 51.5350, lng: 0.0850 },
 };
 
+function getCityBase(locationName) {
+  const loc = locationName.trim();
+  if (UK_CITY_COORDS[loc]) return UK_CITY_COORDS[loc];
+  if (loc.toLowerCase().includes('ig11') || loc.toLowerCase().includes('barking')) {
+    return UK_CITY_COORDS['Barking'];
+  }
+  return { lat: 53.5, lng: -2.0 };
+}
+
 function generateStoresForLocation(locationName) {
-  const base = UK_CITY_COORDS[locationName] || { lat: 53.5, lng: -2.0 };
+  const base = getCityBase(locationName);
   return [
     { id: 's1', name: `Tesco Express, ${locationName}`, area: locationName, distance: parseFloat((0.3 + Math.random() * 1.5).toFixed(1)), stock: 'In stock', website: 'https://www.tesco.com/groceries', lat: base.lat + 0.005, lng: base.lng + 0.003 },
     { id: 's2', name: `Sainsbury's Local, ${locationName}`, area: locationName, distance: parseFloat((0.8 + Math.random() * 2).toFixed(1)), stock: 'In stock', website: 'https://www.sainsburys.co.uk', lat: base.lat - 0.008, lng: base.lng - 0.005 },
@@ -248,7 +374,41 @@ app.get('/api/products/:id', (req, res) => {
   const userLocation = req.query.location || 'Newcastle upon Tyne';
   const product = products.find(p => p.id === parseInt(req.params.id));
   if (product) {
-    const stores = UK_STORE_MAP[userLocation] || generateStoresForLocation(userLocation);
+    let stores = [];
+    const base = getCityBase(userLocation);
+    const isBarking = userLocation.toLowerCase().includes('ig11') || userLocation.toLowerCase().includes('barking');
+    
+    // Check if it's a dynamically generated "far away" culture
+    const isDynamicCulture = !['hi', 'ar', 'pt', 'zh'].includes(product.culture);
+
+    if (isDynamicCulture) {
+      stores = [
+        { id: 's1', name: `${product.retailerName}`, area: 'Midlands Distribution Centre', distance: parseFloat((110 + Math.random() * 30).toFixed(1)), stock: 'Available Online', website: 'https://amazon.co.uk', lat: 52.5, lng: -1.5 }
+      ];
+    } else if (product.category === 'food') {
+      if (isBarking) {
+        stores = [
+          { id: 's1', name: 'Eastern Paradise Restaurant', area: 'Ripple Road, Barking', distance: 0.8, stock: 'Available', website: 'https://thefork.com/eastern-paradise', lat: 51.534, lng: 0.082 }
+        ];
+      } else {
+        stores = [
+          { id: 's1', name: `${product.retailerName || 'Local Restaurant'}`, area: userLocation, distance: 1.2, stock: 'Available', website: product.retailerUrl || '', lat: base.lat + 0.005, lng: base.lng + 0.005 }
+        ];
+      }
+    } else if (['home', 'fashion', 'wellness'].includes(product.category)) {
+      stores = [
+        { id: 's1', name: `${product.retailerName || 'Local Cultural Boutique'}`, area: userLocation, distance: 1.8, stock: 'In stock', website: product.retailerUrl || '', lat: base.lat - 0.005, lng: base.lng + 0.005 }
+      ];
+    } else {
+      if (isBarking) {
+        stores = [
+          { id: 's1', name: 'ASDA Superstore, Barking', area: 'Barking IG11', distance: 1.1, stock: 'In stock', website: 'https://www.asda.com', lat: 51.5362, lng: 0.0812 }
+        ];
+      } else {
+        stores = UK_STORE_MAP[userLocation] || generateStoresForLocation(userLocation);
+      }
+    }
+
     const localizedProduct = {
       ...product,
       userLocation,
