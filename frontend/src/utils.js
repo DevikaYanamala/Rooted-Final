@@ -1,5 +1,7 @@
 // import { productsData } from './data';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 /** Script/diacritics + English demo keywords. UI stays English; this only picks which product pool to search. */
 export function detectCulture(text) {
   const raw = (text || '').trim();
@@ -32,7 +34,7 @@ export async function searchProducts(query, cultureFilter, sort, category, locat
   if (location) params.set('location', location);
 
   try {
-    const res = await fetch(`http://localhost:3000/api/products?${params.toString()}`);
+    const res = await fetch(`${API_BASE}/api/products?${params.toString()}`);
     if (!res.ok) throw new Error('API Error');
     return await res.json();
   } catch (err) {
@@ -50,7 +52,7 @@ export async function trackEvent(eventType, targetId, location, metadata = {}) {
       sessionStorage.setItem('rooted_session_id', sessionId);
     }
 
-    await fetch('http://localhost:3000/api/analytics/track', {
+    await fetch(`${API_BASE}/api/analytics/track`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
