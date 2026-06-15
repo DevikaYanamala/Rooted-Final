@@ -4,6 +4,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { ArrowLeft, MapPin, Award, ExternalLink, Star, Search, X, ClipboardList, Store } from 'lucide-react';
 import { productsData } from '../data';
 import { getProductAverageRating, formatAvgRating, authenticityToSliderValue, detectCulture } from '../utils';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 import ExpandableSearchField from '../components/ExpandableSearchField';
 import { useReviews } from '../context/ReviewsContext';
 import { useSearchTopPick } from '../context/SearchTopPickContext';
@@ -54,7 +56,7 @@ function ProductPageContent({ product, mutateProduct }) {
 
   const submitRating = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/products/${product.id}/reviews`, {
+      const res = await fetch(`${API_BASE}/api/products/${product.id}/reviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -413,7 +415,7 @@ export default function ProductPage() {
   const { location } = usePreferences();
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/products/${id}?location=${encodeURIComponent(location)}`)
+    fetch(`${API_BASE}/api/products/${id}?location=${encodeURIComponent(location)}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         setProduct(data);
