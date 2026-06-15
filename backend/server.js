@@ -598,9 +598,14 @@ function buildOrderEmail({ customerName, items, totalPence }) {
 }
 
 // ── Start ──────────────────────────────────────────────────────────────────────
-app.listen(port, () => {
-  console.log(`🌿 Rooted backend running at http://localhost:${port}`);
-  console.log(`   MongoDB: ${mongoURI ? '✅ configured' : '⚠️  not configured (set MONGODB_URI to track data)'}`);
-  console.log(`   Stripe: ${stripe ? '✅ configured' : '⚠️  not configured (set STRIPE_SECRET_KEY)'}`);
-  console.log(`   Email:  ${resend ? '✅ configured' : '⚠️  not configured (set RESEND_API_KEY)'}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`🌿 Rooted backend running at http://localhost:${port}`);
+    console.log(`   MongoDB: ${mongoURI ? '✅ configured' : '⚠️  not configured (set MONGODB_URI to track data)'}`);
+    console.log(`   Stripe: ${stripe ? '✅ configured' : '⚠️  not configured (set STRIPE_SECRET_KEY)'}`);
+    console.log(`   Email:  ${resend ? '✅ configured' : '⚠️  not configured (set RESEND_API_KEY)'}`);
+  });
+}
+
+// Export for Vercel serverless functions
+export default app;
