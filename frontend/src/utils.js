@@ -41,6 +41,31 @@ export async function searchProducts(query, cultureFilter, sort, category, locat
   }
 }
 
+export async function trackEvent(eventType, targetId, location, metadata = {}) {
+  try {
+    // Generate a simple session ID if one doesn't exist
+    let sessionId = sessionStorage.getItem('rooted_session_id');
+    if (!sessionId) {
+      sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+      sessionStorage.setItem('rooted_session_id', sessionId);
+    }
+
+    await fetch('http://localhost:3000/api/analytics/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventType,
+        userId: sessionId,
+        location: location || 'Unknown',
+        targetId,
+        metadata
+      })
+    });
+  } catch (err) {
+    console.error('Telemetry failed:', err);
+  }
+}
+
 export function getCultureName(culture, t) {
   if (!culture) return t('all_cultures');
   if (culture === 'ar') return t('culture_arabic');

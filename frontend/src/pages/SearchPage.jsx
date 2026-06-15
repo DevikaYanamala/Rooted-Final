@@ -2,7 +2,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
 import { Award, MapPin, Tag } from 'lucide-react';
-import { detectCulture, searchProducts, getCultureName } from '../utils';
+import { detectCulture, searchProducts, getCultureName, trackEvent } from '../utils';
 import ProductCard from '../components/ProductCard';
 import ExpandableSearchField from '../components/ExpandableSearchField';
 import { useSearchTopPick } from '../context/SearchTopPickContext';
@@ -66,6 +66,10 @@ export default function SearchPage() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (!query.trim()) return;
+    
+    // TRACK THE SEARCH EVENT!
+    trackEvent('search', query.trim(), location, { category, culture });
+    
     const detected = detectCulture(query);
     const params = new URLSearchParams({ q: query });
     if (detected) params.set('culture', detected);

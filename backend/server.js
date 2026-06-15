@@ -5,7 +5,27 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
+import mongoose from 'mongoose';
 import { productsData } from './data.js';
+
+// ── Database Connection ────────────────────────────────────────────────────────
+const mongoURI = process.env.MONGODB_URI;
+if (mongoURI) {
+  mongoose.connect(mongoURI)
+    .then(() => console.log('✅ Connected to MongoDB Atlas'))
+    .catch(err => console.error('❌ MongoDB connection error:', err));
+}
+
+// ── Analytics Schema ───────────────────────────────────────────────────────────
+const analyticsSchema = new mongoose.Schema({
+  eventType: String, // e.g. 'search', 'click', 'purchase'
+  userId: String,
+  location: String,
+  targetId: String,  // e.g. search query or product ID
+  metadata: mongoose.Schema.Types.Mixed,
+  timestamp: { type: Date, default: Date.now }
+});
+const AnalyticsLog = mongoose.model('AnalyticsLog', analyticsSchema);
 
 // ── Clients ──────────────────────────────────────────────────────────────────
 const stripe = process.env.STRIPE_SECRET_KEY
@@ -110,6 +130,25 @@ app.post(
 
 // ── Body parser (after webhook route) ────────────────────────────────────────
 app.use(express.json());
+
+// ── Analytics Tracking Endpoint ──────────────────────────────────────────────
+app.post('/api/analytics/track', async (req, res) => {
+  if (!mongoURI) {
+    // If no DB is connected, silently succeed so the frontend doesn't crash during dev
+    return res.json({ success: true, message: 'DB not configured, skipped tracking.' });
+  }
+  try {
+    const { eventType, userId, location, targetId, metadata } = req.body;
+    const newLog = new AnalyticsLog({
+      eventType, userId, location, targetId, metadata
+    });
+    await newLog.save();
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Tracking Error:', error);
+    res.status(500).json({ error: 'Failed to track event' });
+  }
+});
 
 // ── Rate limiting ─────────────────────────────────────────────────────────────
 const paymentLimiter = rateLimit({
@@ -561,6 +600,7 @@ function buildOrderEmail({ customerName, items, totalPence }) {
 // ── Start ──────────────────────────────────────────────────────────────────────
 app.listen(port, () => {
   console.log(`🌿 Rooted backend running at http://localhost:${port}`);
+  console.log(`   MongoDB: ${mongoURI ? '✅ configured' : '⚠️  not configured (set MONGODB_URI to track data)'}`);
   console.log(`   Stripe: ${stripe ? '✅ configured' : '⚠️  not configured (set STRIPE_SECRET_KEY)'}`);
   console.log(`   Email:  ${resend ? '✅ configured' : '⚠️  not configured (set RESEND_API_KEY)'}`);
 });

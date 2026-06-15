@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Star, ExternalLink } from 'lucide-react';
-import { getProductAverageRating, formatAvgRating } from '../utils';
+import { getProductAverageRating, formatAvgRating, trackEvent } from '../utils';
 import { useReviews } from '../context/ReviewsContext';
 import TastesLikeHomeStamp from './TastesLikeHomeStamp';
 
@@ -14,7 +14,10 @@ export default function ProductCard({ product, isTopPick = false }) {
   const extra = communityReviews[product.id] ?? NO_EXTRA;
   const avg = getProductAverageRating(product, extra);
 
-  const go = () => navigate(`/product/${product.id}`);
+  const go = () => {
+    trackEvent('click', product.name, product.location, { productId: product.id, category: product.category });
+    navigate(`/product/${product.id}`);
+  };
 
   return (
     <article
