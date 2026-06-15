@@ -43,25 +43,19 @@ const port = process.env.PORT || 3000;
 // Security headers
 app.use(helmet());
 
-// CORS — locked to the frontend URL only
-const allowedOrigins = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
-  'http://localhost:5173',
-  'http://localhost:4173',
-  'http://localhost:5174',
-  'http://localhost:5175',
-  'http://localhost:5176',
-];
-
+// CORS — allow localhost (dev) and all Vercel deployments (production)
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow server-to-server calls (no origin) and known origins
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS blocked: ${origin}`));
-      }
+      // Allow requests with no origin (server-to-server, Postman, etc.)
+      if (!origin) return callback(null, true);
+      // Allow all localhost ports for local development
+      if (/^http:\/\/localhost(:\d+)?$/.test(origin)) return callback(null, true);
+      // Allow all Vercel preview and production deployments
+      if (/\.vercel\.app$/.test(origin)) return callback(null, true);
+      // Allow custom domain if set
+      if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) return callback(null, true);
+      callback(new Error(`CORS blocked: ${origin}`));
     },
     credentials: true,
   })
