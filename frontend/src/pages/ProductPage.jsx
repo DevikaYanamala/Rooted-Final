@@ -5,7 +5,9 @@ import { ArrowLeft, MapPin, Award, ExternalLink, Star, Search, X, ClipboardList,
 import { productsData } from '../data';
 import { getProductAverageRating, formatAvgRating, authenticityToSliderValue, detectCulture } from '../utils';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : 'https://rooted-backend-psi.vercel.app';
 import ExpandableSearchField from '../components/ExpandableSearchField';
 import { useReviews } from '../context/ReviewsContext';
 import { useSearchTopPick } from '../context/SearchTopPickContext';
