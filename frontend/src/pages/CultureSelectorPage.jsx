@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Globe2, ChevronLeft, Search, ArrowRight, MapPin } from 'lucide-react';
+import { detectCulture } from '../utils';
 
 export default function CultureSelectorPage() {
   const navigate = useNavigate();
@@ -12,7 +13,10 @@ export default function CultureSelectorPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!cultureQuery.trim()) return;
-    navigate(`/search?category=${category}&culture=${encodeURIComponent(cultureQuery.trim())}`);
+    const detected = detectCulture(cultureQuery.trim());
+    const params = new URLSearchParams({ q: cultureQuery.trim(), category });
+    if (detected) params.set('culture', detected);
+    navigate(`/search?${params.toString()}`);
   };
 
   // Removed scroll lock to allow scrolling on smaller screens
