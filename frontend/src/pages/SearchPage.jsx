@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useMemo } from 'react';
-import { Award, MapPin, Tag } from 'lucide-react';
+import { Award, MapPin, Tag, Compass } from 'lucide-react';
 import { detectCulture, searchProducts, getCultureName, trackEvent } from '../utils';
 import ProductCard from '../components/ProductCard';
 import ExpandableSearchField from '../components/ExpandableSearchField';
@@ -122,8 +122,52 @@ export default function SearchPage() {
       </div>
 
       {results.length === 0 ? (
-        <div className="empty-state">
-          <p>{t('no_results')}</p>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '3rem 1.5rem',
+          textAlign: 'center',
+          background: '#fff',
+          borderRadius: '16px',
+          border: '1px solid var(--color-border)',
+          margin: '16px',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
+          <div style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            background: 'rgba(217, 93, 57, 0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--color-primary)',
+            marginBottom: '1rem'
+          }}>
+            <Compass size={28} />
+          </div>
+          <h3 style={{
+            fontSize: '1.2rem',
+            color: 'var(--color-secondary)',
+            marginBottom: '0.5rem',
+            fontFamily: 'var(--font-heading)',
+            fontWeight: '700'
+          }}>
+            Products Coming Soon!
+          </h3>
+          <p style={{
+            fontSize: '0.85rem',
+            color: 'var(--color-text-light)',
+            maxWidth: '360px',
+            lineHeight: '1.5',
+            marginBottom: '1.5rem',
+            marginInline: 'auto'
+          }}>
+            We couldn't find any community-verified products for <strong>{getCultureName(culture, t)}</strong> in Newcastle yet. Rooted is constantly expanding its directory of authentic local stores and items.
+          </p>
+          <RequestProductButton cultureName={getCultureName(culture, t)} />
         </div>
       ) : (
         <div className="product-list" role="list">
@@ -137,5 +181,37 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function RequestProductButton({ cultureName }) {
+  const [requested, setRequested] = useState(false);
+
+  const handleRequest = () => {
+    setRequested(true);
+    trackEvent('product_request', cultureName, 'Newcastle upon Tyne', { source: 'empty_state' });
+  };
+
+  return (
+    <button
+      onClick={handleRequest}
+      disabled={requested}
+      style={{
+        padding: '10px 20px',
+        backgroundColor: requested ? '#204E4A' : 'var(--color-primary)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '999px',
+        fontSize: '0.82rem',
+        fontWeight: '600',
+        cursor: requested ? 'default' : 'pointer',
+        transition: 'background 0.2s',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px'
+      }}
+    >
+      {requested ? '✓ Request Submitted!' : `Request ${cultureName} Products`}
+    </button>
   );
 }

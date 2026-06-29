@@ -1732,3 +1732,73 @@
     max-width: min(800px, 100%);
   }
 }
+
+/* ════════════════════════════════════════
+   Mobile Nav Adjustments & Cart Selector Styling
+   ════════════════════════════════════════ */
+.cart-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  color: var(--color-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.cart-selector:hover {
+  border-color: var(--color-secondary);
+  background: var(--color-bg);
+}
+
+.cart-selector__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 1px solid #fff;
+}
+
+@media (max-width: 600px) {
+  .top-nav__name {
+    display: none !important; /* Hide brand title on small screens to save space */
+  }
+  
+  .location-selector__text {
+    max-width: 75px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .top-nav__actions {
+    gap: 0.4rem !important; /* Tighten gaps between items */
+    flex-wrap: nowrap;
+  }
+
+  .location-selector {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .top-nav {
+    padding: 8px 10px; /* Bring padding in on sides slightly */
+  }
+}
