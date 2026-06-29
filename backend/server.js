@@ -51,8 +51,8 @@ app.use(
       if (!origin) return callback(null, true);
       // Allow all localhost ports for local development
       if (/^http:\/\/localhost(:\d+)?$/.test(origin)) return callback(null, true);
-      // Allow all Vercel preview and production deployments
-      if (/\.vercel\.app$/.test(origin)) return callback(null, true);
+      // Allow all Vercel and Netlify deployments
+      if (/\.vercel\.app$/.test(origin) || /\.netlify\.app$/.test(origin)) return callback(null, true);
       // Allow custom domain if set
       if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) return callback(null, true);
       callback(new Error(`CORS blocked: ${origin}`));
