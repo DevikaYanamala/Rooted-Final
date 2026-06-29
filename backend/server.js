@@ -11,15 +11,26 @@ import { productsData } from './data.js';
 // ── Database Connection ────────────────────────────────────────────────────────
 let dbError = null;
 const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://devikayanamala611_db_user:T4A0uWGGP2g6MskN@cluster0.elroo7v.mongodb.net/RootedDB?appName=Cluster0';
-mongoose.connect(mongoURI)
-  .then(() => {
-    console.log('✅ Connected to MongoDB Atlas');
+
+async function connectToDatabase() {
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
+  try {
+    await mongoose.connect(mongoURI, {
+      serverSelectionTimeoutMS: 5000 // 5 second timeout
+    });
     dbError = null;
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection error:', err);
+  } catch (err) {
     dbError = err.message || String(err);
-  });
+    throw err;
+  }
+}
+
+// In development, initiate connection immediately
+if (process.env.NODE_ENV !== 'production') {
+  connectToDatabase().catch(err => console.error('Local DB Connection Error:', err));
+}
 
 // ── Analytics Schema ───────────────────────────────────────────────────────────
 const analyticsSchema = new mongoose.Schema({
@@ -130,7 +141,10 @@ app.post(
 // ── Body parser (after webhook route) ────────────────────────────────────────
 app.use(express.json());
 
-app.get('/api/db-status', (req, res) => {
+app.get('/api/db-status', async (req, res) => {
+  try {
+    await connectToDatabase();
+  } catch (err) {}
   res.json({
     readyState: mongoose.connection.readyState,
     readyStateDesc: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState] || 'unknown',
@@ -141,11 +155,8 @@ app.get('/api/db-status', (req, res) => {
 
 // ── Analytics Tracking Endpoint ──────────────────────────────────────────────
 app.post('/api/analytics/track', async (req, res) => {
-  // Check actual connection state (1 = connected), not just URI string
-  if (!mongoURI || mongoose.connection.readyState !== 1) {
-    return res.json({ success: true, message: 'DB not connected, skipped tracking.' });
-  }
   try {
+    await connectToDatabase();
     const { eventType, userId, location, targetId, metadata } = req.body;
     const newLog = new AnalyticsLog({
       eventType, userId, location, targetId, metadata
@@ -155,7 +166,7 @@ app.post('/api/analytics/track', async (req, res) => {
   } catch (error) {
     console.error('Tracking Error:', error);
     // Still return success to frontend so it doesn't crash
-    res.json({ success: false, message: 'Tracking temporarily unavailable.' });
+    res.json({ success: false, message: 'Tracking temporarily unavailable.', error: error.message });
   }
 });
 
