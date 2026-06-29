@@ -127,9 +127,9 @@ app.use(express.json());
 
 // ── Analytics Tracking Endpoint ──────────────────────────────────────────────
 app.post('/api/analytics/track', async (req, res) => {
-  if (!mongoURI) {
-    // If no DB is connected, silently succeed so the frontend doesn't crash during dev
-    return res.json({ success: true, message: 'DB not configured, skipped tracking.' });
+  // Check actual connection state (1 = connected), not just URI string
+  if (!mongoURI || mongoose.connection.readyState !== 1) {
+    return res.json({ success: true, message: 'DB not connected, skipped tracking.' });
   }
   try {
     const { eventType, userId, location, targetId, metadata } = req.body;
@@ -140,7 +140,8 @@ app.post('/api/analytics/track', async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     console.error('Tracking Error:', error);
-    res.status(500).json({ error: 'Failed to track event' });
+    // Still return success to frontend so it doesn't crash
+    res.json({ success: false, message: 'Tracking temporarily unavailable.' });
   }
 });
 
