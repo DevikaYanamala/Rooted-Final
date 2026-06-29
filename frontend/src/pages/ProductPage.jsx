@@ -7,7 +7,7 @@ import { getProductAverageRating, formatAvgRating, authenticityToSliderValue, de
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : 'https://rooted-backend-psi.vercel.app';
+  : window.location.origin;
 import ExpandableSearchField from '../components/ExpandableSearchField';
 import { useReviews } from '../context/ReviewsContext';
 import { useSearchTopPick } from '../context/SearchTopPickContext';

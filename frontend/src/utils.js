@@ -2,7 +2,7 @@
 
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : 'https://rooted-backend-psi.vercel.app';
+  : window.location.origin;
 
 /** Script/diacritics + English demo keywords. UI stays English; this only picks which product pool to search. */
 export function detectCulture(text) {
