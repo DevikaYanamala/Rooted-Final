@@ -9,10 +9,17 @@ import mongoose from 'mongoose';
 import { productsData } from './data.js';
 
 // ── Database Connection ────────────────────────────────────────────────────────
+let dbError = null;
 const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://devikayanamala611_db_user:T4A0uWGGP2g6MskN@cluster0.elroo7v.mongodb.net/RootedDB?appName=Cluster0';
 mongoose.connect(mongoURI)
-  .then(() => console.log('✅ Connected to MongoDB Atlas'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+  .then(() => {
+    console.log('✅ Connected to MongoDB Atlas');
+    dbError = null;
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err);
+    dbError = err.message || String(err);
+  });
 
 // ── Analytics Schema ───────────────────────────────────────────────────────────
 const analyticsSchema = new mongoose.Schema({
@@ -122,6 +129,15 @@ app.post(
 
 // ── Body parser (after webhook route) ────────────────────────────────────────
 app.use(express.json());
+
+app.get('/api/db-status', (req, res) => {
+  res.json({
+    readyState: mongoose.connection.readyState,
+    readyStateDesc: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState] || 'unknown',
+    hasUri: !!mongoURI,
+    error: dbError
+  });
+});
 
 // ── Analytics Tracking Endpoint ──────────────────────────────────────────────
 app.post('/api/analytics/track', async (req, res) => {
