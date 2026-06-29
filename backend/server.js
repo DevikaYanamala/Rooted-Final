@@ -9,12 +9,10 @@ import mongoose from 'mongoose';
 import { productsData } from './data.js';
 
 // ── Database Connection ────────────────────────────────────────────────────────
-const mongoURI = process.env.MONGODB_URI;
-if (mongoURI) {
-  mongoose.connect(mongoURI)
-    .then(() => console.log('✅ Connected to MongoDB Atlas'))
-    .catch(err => console.error('❌ MongoDB connection error:', err));
-}
+const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://devikayanamala611_db_user:T4A0uWGGP2g6MskN@cluster0.elroo7v.mongodb.net/RootedDB?appName=Cluster0';
+mongoose.connect(mongoURI)
+  .then(() => console.log('✅ Connected to MongoDB Atlas'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // ── Analytics Schema ───────────────────────────────────────────────────────────
 const analyticsSchema = new mongoose.Schema({
