@@ -1777,28 +1777,46 @@
 }
 
 @media (max-width: 600px) {
+  /* Hide brand name — logo alone identifies the app */
   .top-nav__name {
-    display: none !important; /* Hide brand title on small screens to save space */
+    display: none !important;
   }
-  
+
+  /* Hide language selector on mobile — too wide, pushes cart off screen */
+  .top-nav__actions > div:first-child {
+    display: none !important;
+  }
+
+  /* Tighten the remaining actions row */
+  .top-nav__actions {
+    gap: 0.35rem !important;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Truncate long location names */
   .location-selector__text {
-    max-width: 75px;
+    max-width: 90px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  
-  .top-nav__actions {
-    gap: 0.4rem !important; /* Tighten gaps between items */
-    flex-wrap: nowrap;
-  }
 
+  /* Compact location pill */
   .location-selector {
-    padding: 6px 8px;
-    gap: 4px;
+    padding: 5px 8px;
+    gap: 3px;
+    flex-shrink: 1;
+    min-width: 0;
   }
 
+  /* Cart button — always visible, never shrinks */
+  .cart-selector {
+    flex-shrink: 0 !important;
+  }
+
+  /* Nav side padding */
   .top-nav {
-    padding: 8px 10px; /* Bring padding in on sides slightly */
+    padding: 8px 12px;
   }
 }
