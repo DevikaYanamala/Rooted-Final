@@ -10,7 +10,7 @@ import { productsData } from './data.js';
 
 // ── Database Connection ────────────────────────────────────────────────────────
 let dbError = null;
-const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://devikayanamala611_db_user:T4A0uWGGP2g6MskN@cluster0.elroo7v.mongodb.net/RootedDB?appName=Cluster0';
+const mongoURI = process.env.MONGODB_URI; // Set via .env locally, Vercel env vars in production
 
 async function connectToDatabase() {
   if (mongoose.connection.readyState === 1) {
