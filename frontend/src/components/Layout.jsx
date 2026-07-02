@@ -95,7 +95,8 @@ export default function Layout() {
       if (data.status === 200 && data.result && data.result.length > 0) {
         // Validation Passed! Use the verified API spelling
         const verifiedPlace = data.result[0];
-        const verifiedString = `${verifiedPlace.name_1}${verifiedPlace.outcode ? `, ${verifiedPlace.outcode}` : ''}`;
+        // Use city name only (no postcode) so it matches UK_STORE_MAP keys on the backend
+        const verifiedString = verifiedPlace.name_1;
         updateLocation(verifiedString);
         setShowLocation(false);
         setTempLocation('');

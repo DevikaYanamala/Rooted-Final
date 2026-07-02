@@ -472,10 +472,15 @@ function getCityBase(locationName) {
 
 function generateStoresForLocation(locationName) {
   const base = getCityBase(locationName);
+  // Deterministic "hash" from location name so distances stay stable across fetches
+  const seed = locationName.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const d1 = parseFloat((0.3 + (seed % 15) / 10).toFixed(1));
+  const d2 = parseFloat((0.8 + (seed % 20) / 10).toFixed(1));
+  const d3 = parseFloat((1.0 + (seed % 30) / 10).toFixed(1));
   return [
-    { id: 's1', name: `Tesco Express, ${locationName}`, area: locationName, distance: parseFloat((0.3 + Math.random() * 1.5).toFixed(1)), stock: 'In stock', website: 'https://www.tesco.com/groceries', lat: base.lat + 0.005, lng: base.lng + 0.003 },
-    { id: 's2', name: `Sainsbury's Local, ${locationName}`, area: locationName, distance: parseFloat((0.8 + Math.random() * 2).toFixed(1)), stock: 'In stock', website: 'https://www.sainsburys.co.uk', lat: base.lat - 0.008, lng: base.lng - 0.005 },
-    { id: 's3', name: `ASDA, ${locationName}`, area: locationName, distance: parseFloat((1.0 + Math.random() * 3).toFixed(1)), stock: 'Few left', website: 'https://www.asda.com', lat: base.lat + 0.012, lng: base.lng + 0.01 },
+    { id: 's1', name: `Tesco Express, ${locationName}`, area: locationName, distance: d1, stock: 'In stock', website: 'https://www.tesco.com/groceries', lat: base.lat + 0.005, lng: base.lng + 0.003 },
+    { id: 's2', name: `Sainsbury's Local, ${locationName}`, area: locationName, distance: d2, stock: 'In stock', website: 'https://www.sainsburys.co.uk', lat: base.lat - 0.008, lng: base.lng - 0.005 },
+    { id: 's3', name: `ASDA, ${locationName}`, area: locationName, distance: d3, stock: 'Few left', website: 'https://www.asda.com', lat: base.lat + 0.012, lng: base.lng + 0.01 },
   ];
 }
 
